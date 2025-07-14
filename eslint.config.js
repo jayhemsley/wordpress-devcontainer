@@ -1,7 +1,8 @@
 import js from '@eslint/js';
-import { defineConfig } from 'eslint/config';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import eslintPluginImport from 'eslint-plugin-import';
+// eslint-disable-next-line import/no-unresolved
+import { defineConfig } from 'eslint/config';
 
 export default defineConfig([
   js.configs.recommended,
@@ -14,5 +15,5 @@ export default defineConfig([
       sourceType: 'module',
     },
   },
-  eslintConfigPrettier
+  eslintConfigPrettier,
 ]);
