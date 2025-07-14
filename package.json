@@ -2,6 +2,7 @@
   "name": "wordpress-devcontainer",
   "version": "0.0.1",
   "description": "Container-based development workflow for WordPress themes and plugins.",
+  "license": "MIT",
   "author": {
     "name": "Jay Hemsley",
     "email": "jay@hemsley.dev",
@@ -53,7 +54,6 @@
     "hot": "mix watch --hot",
     "production": "mix --production",
     "prepare": "husky",
-    "pre-commit": "lint-staged",
     "prettier": "prettier --write .",
     "eslint": "eslint --fix .",
     "stylelint": "stylelint --fix .",
