@@ -1,0 +1,44 @@
+services:
+  wordpress:
+    container_name: ${PROJECT_NAME:?error}-wordpress
+    image: wordpress:latest
+    restart: unless-stopped
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER:?error}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD:?error}
+      WORDPRESS_DEBUG: ${WORDPRESS_DEBUG:-}
+    depends_on:
+      - mysql
+    networks:
+      - app
+    volumes:
+      - wordpress-data:/var/www/html
+      - ../:/var/www/html/wp-content/themes/devcontainer-theme:z
+
+  mysql:
+    container_name: ${PROJECT_NAME:?error}-mysql
+    image: mysql:latest
+    restart: unless-stopped
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${WORDPRESS_DB_NAME:?error}
+      MYSQL_USER: ${WORDPRESS_DB_USER:?error}
+      MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD:?error}
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    networks:
+      - app
+
+volumes:
+  wordpress-data:
+    name: ${PROJECT_NAME:?error}-wordpress-data
+  mysql-data:
+    name: ${PROJECT_NAME:?error}-mysql-data
+
+networks:
+  app:
+    name: ${PROJECT_NAME:?error}-network
