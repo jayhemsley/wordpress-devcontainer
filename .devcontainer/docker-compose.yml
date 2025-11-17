@@ -4,9 +4,6 @@ services:
   wordpress:
     container_name: ${PROJECT_NAME}-wordpress
     image: wordpress:latest
-    labels:
-      caddy: ${PROJECT_URL:-${PROJECT_NAME}.localhost}
-      caddy.reverse_proxy: "{{upstreams 80}}"
     environment:
       PROJECT_NAME: ${PROJECT_NAME}
       WORDPRESS_DB_HOST: mysql:3306

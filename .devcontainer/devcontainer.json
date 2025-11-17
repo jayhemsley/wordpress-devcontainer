@@ -1,5 +1,5 @@
 {
-  "name": "WordPress Theme Development Container - Standard",
+  "name": "Standard Configuration",
   "dockerComposeFile": "docker-compose.yml",
   "service": "wordpress",
   "workspaceFolder": "/workspace",

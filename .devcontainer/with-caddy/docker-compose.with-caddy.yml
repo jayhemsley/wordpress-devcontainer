@@ -1,9 +1,12 @@
 services:
   wordpress:
+    labels:
+      caddy: ${PROJECT_URL:-${PROJECT_NAME}.localhost}
+      caddy.reverse_proxy: "{{upstreams 80}}"
+    ports: []
     networks:
       - default
       - proxy
-
 networks:
   default:
     name: ${PROJECT_NAME}-network
