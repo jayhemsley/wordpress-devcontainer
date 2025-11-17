@@ -1,19 +1,16 @@
 {
-  "name": "Caddy/Reverse Proxy Configuration",
+  "name": "Caddy Configuration",
   "dockerComposeFile": [
     "../docker-compose.yml",
     "docker-compose.with-caddy.yml"
   ],
   "service": "wordpress",
   "workspaceFolder": "/workspace",
-  "postCreateCommand": "usermod -aG root www-data && npm install",
+  "postCreateCommand": "bash .devcontainer/post_create.sh",
   "features": {
-    "ghcr.io/devcontainers/features/sshd:1": {},
     "ghcr.io/devcontainers/features/git:1": {},
-    "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers/features/node:1": {},
-    "ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {},
-    "ghcr.io/devcontainers/features/python:1": {}
+    "ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {}
   },
   "customizations": {
     "vscode": {

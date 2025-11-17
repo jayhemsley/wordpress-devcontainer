@@ -67,9 +67,16 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    entrypoint: /bin/bash -c "
+      usermod -aG root www-data &&
+      apt-get update &&
+      apt-get install -y openssh-server &&
+      mkdir -p /var/run/sshd &&
+      service ssh start &&
+      docker-entrypoint.sh apache2-foreground"
   mysql:
     container_name: ${PROJECT_NAME}-mysql
-    image: mysql:latest
+    image: mysql:8
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: "true"
       MYSQL_DATABASE: ${MYSQL_DATABASE}
