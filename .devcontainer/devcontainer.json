@@ -3,7 +3,7 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "wordpress",
   "workspaceFolder": "/workspace",
-  "postCreateCommand": "usermod -aG root www-data && npm install",
+  "postCreateCommand": "usermod -aG root www-data && bash -c 'if [ -s \"$NVM_DIR/nvm.sh\" ]; then source \"$NVM_DIR/nvm.sh\"; fi && if [ -f .nvmrc ]; then nvm install && nvm use; fi && if [ -f package.json ]; then npm install; fi'",
   "features": {
     "ghcr.io/devcontainers/features/sshd:1": {},
     "ghcr.io/devcontainers/features/git:1": {},

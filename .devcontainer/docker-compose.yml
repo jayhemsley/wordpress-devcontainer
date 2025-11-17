@@ -3,7 +3,7 @@ name: ${PROJECT_NAME}
 services:
   wordpress:
     container_name: ${PROJECT_NAME}-wordpress
-    image: wordpress:latest
+    image: wordpress:${WP_VERSION:-latest}
     environment:
       PROJECT_NAME: ${PROJECT_NAME}
       WORDPRESS_DB_HOST: mysql:3306
