@@ -1,0 +1,12 @@
+services:
+  wordpress:
+    networks:
+      - default
+      - proxy
+
+networks:
+  default:
+    name: ${PROJECT_NAME}-network
+  proxy:
+    name: ${PROXY_NETWORK}
+    external: true

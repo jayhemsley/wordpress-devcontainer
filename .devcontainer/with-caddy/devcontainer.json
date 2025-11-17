@@ -1,6 +1,9 @@
 {
-  "name": "WordPress Theme Development Container - Standard",
-  "dockerComposeFile": "docker-compose.yml",
+  "name": "WordPress Theme Development Container - With Caddy",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "docker-compose.with-caddy.yml"
+  ],
   "service": "wordpress",
   "workspaceFolder": "/workspace",
   "postCreateCommand": "usermod -aG root www-data && npm install",
@@ -9,7 +12,8 @@
     "ghcr.io/devcontainers/features/git:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers/features/node:1": {},
-    "ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {}
+    "ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {},
+    "ghcr.io/devcontainers/features/python:1": {}
   },
   "customizations": {
     "vscode": {

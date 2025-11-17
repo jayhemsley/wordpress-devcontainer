@@ -1,44 +1,107 @@
+name: ${PROJECT_NAME}
+
 services:
   wordpress:
-    container_name: ${PROJECT_NAME:?error}-wordpress
+    container_name: ${PROJECT_NAME}-wordpress
     image: wordpress:latest
-    restart: unless-stopped
-    ports:
-      - 8080:80
+    labels:
+      caddy: ${PROJECT_URL:-${PROJECT_NAME}.localhost}
+      caddy.reverse_proxy: "{{upstreams 80}}"
     environment:
-      WORDPRESS_DB_HOST: mysql
-      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
-      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER:?error}
-      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD:?error}
-      WORDPRESS_DEBUG: ${WORDPRESS_DEBUG:-}
-    depends_on:
-      - mysql
-    networks:
-      - app
-    volumes:
-      - wordpress-data:/var/www/html
-      - ../:/var/www/html/wp-content/themes/devcontainer-theme:z
+      PROJECT_NAME: ${PROJECT_NAME}
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DEBUG: ${WP_DEBUG}
+      WP_DEVELOPMENT_MODE: ${WP_DEVELOPMENT_MODE}
+      WP_ENVIRONMENT_TYPE: ${WP_ENVIRONMENT_TYPE}
+      WORDPRESS_CONFIG_EXTRA: |
+        $$development_mode = getenv('WP_DEVELOPMENT_MODE');
+        $$allowed_development_modes = ['core', 'plugin', 'theme', 'all'];
 
+        if ($$development_mode !== false && $$development_mode !== '') {
+          $$development_mode = strtolower(trim($$development_mode));
+
+          if (in_array($$development_mode, $$allowed_development_modes, true)) {
+            if (!defined('WP_DEVELOPMENT_MODE')) {
+              define('WP_DEVELOPMENT_MODE', $$development_mode);
+            }
+          }
+        }
+
+        $$environment = getenv('WP_ENVIRONMENT_TYPE');
+        $$allowed_environments = ['local', 'development', 'staging', 'production'];
+
+        if ($$environment !== false && $$environment !== '') {
+          $$environment = strtolower(trim($$environment));
+
+          if (in_array($$environment, $$allowed_environments, true)) {
+            if (!defined('WP_ENVIRONMENT_TYPE')) {
+              define('WP_ENVIRONMENT_TYPE', $$environment);
+            }
+          }
+        }
+    ports:
+      - "${PROJECT_PORT:-8080}:80"
+    restart: on-failure:5
+    depends_on:
+      mysql:
+        condition: service_healthy
+        restart: true
+    volumes:
+      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini:ro,Z
+      - wordpress-data:/var/www/html/wp-content
+      - ../:/var/www/html/wp-content/themes/${PROJECT_NAME}:cached,Z
+      - ../:/workspace:cached,Z
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
   mysql:
-    container_name: ${PROJECT_NAME:?error}-mysql
+    container_name: ${PROJECT_NAME}-mysql
     image: mysql:latest
-    restart: unless-stopped
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "true"
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    restart: on-failure:5
     volumes:
       - mysql-data:/var/lib/mysql
-    environment:
-      MYSQL_DATABASE: ${WORDPRESS_DB_NAME:?error}
-      MYSQL_USER: ${WORDPRESS_DB_USER:?error}
-      MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD:?error}
-      MYSQL_RANDOM_ROOT_PASSWORD: '1'
-    networks:
-      - app
-
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u$$MYSQL_USER -p$$MYSQL_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 volumes:
   wordpress-data:
-    name: ${PROJECT_NAME:?error}-wordpress-data
+    name: ${PROJECT_NAME}-wordpress-data
   mysql-data:
-    name: ${PROJECT_NAME:?error}-mysql-data
-
+    name: ${PROJECT_NAME}-mysql-data
 networks:
-  app:
-    name: ${PROJECT_NAME:?error}-network
+  default:
+    name: ${PROJECT_NAME}-network
