@@ -3,7 +3,7 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "wordpress",
   "workspaceFolder": "/workspace",
-  "initializeCommand": "ls -al && cp -n .env.example .env",
+  "initializeCommand": "ls -al && cp -n .env.example .env && ls -al && whoami",
   "postCreateCommand": "bash .devcontainer/post_create.sh",
   "features": {
     "ghcr.io/devcontainers/features/git:1": {},
